@@ -28,17 +28,17 @@ plot(drink ~ aged,data=Death)
 
 # Run the regression of deathrate on drink and aged, year 2010
 
-ols2 = 
+ols2 = lm(deathrate~drink+aged, data=Death, subset = year==2010)
 summary(ols2)
 # beta1 estimate?
-
+# 음수에서 양수로 전환, aged와 deathrate 사이에 음의 상관관계를 제거하고 추정하였더니 양수로 나옴옴
 
 
 ## 분해정리 page 209
 ## partial out
 
 #install.packages("Ecdat")
-#library("Ecdat")
+library("Ecdat")
 
 data(Housing,package="Ecdat")
 summary(Housing)
@@ -58,10 +58,10 @@ uhat_x1 = resid(ols4)
 
 ols5 = lm(log(price)~uhat_x1,data=Housing)
 coefficients(ols5)
+# 추정치가 동일하게 나옴
 
 ols6 = lm(log(price)~uhat_x1+bedrooms,data=Housing)
 coefficients(ols6)
-
 
 # checking, run the regression of uhat_y on uhat_x1
 # run the regression of log(price) on bedrooms and get the residual
@@ -74,10 +74,11 @@ coefficients(ols8)
 ols9=lm(uhat_y~uhat_x1,data=Housing)
 coefficients(ols9)
 
+# partial out(분해정리)에 대한 내용
 
 
 ######
-# 예제 8.3
+# 예제 8.3 perfect collinearity
 
 data(Wages1,package="Ecdat")
 summary(Wages1)
@@ -103,20 +104,21 @@ lm(wage~female+male-1,data=Wages1)
 # intercept를 빼고 regression. perfect collinearity???
 
 lm(wage~female,data=Wages1)
-
+# 6.313-5.147=1.166
 
 
 ols9 = lm(log(wage)~female+school+exper,data=Wages1)
 summary(ols9)
 
 
-
 # random numbers
 Wages1$rnd = rnorm(nrow(Wages1))
 head(Wages1)
+# 해당 값은 설명력이 전혀 없는 변수임
 
 summary(lm(log(wage)~female+school+exper,data=Wages1))$r.sq
+summary(lm(log(wage)~female+school+exper,data=Wages1))$
 
 # R 제곱은 어떤 변수가 포함되어도 증가하는 경향 
 summary(lm(log(wage)~female+school+exper+rnd,data=Wages1))$r.sq
-
+summary(lm(log(wage)~female+school+exper+rnd,data=Wages1))
