@@ -24,7 +24,16 @@ summary(ols1)
 
 
 #2-(a) True -> 잔차의 합은 항상 0인 이유는 오차평균은 0이라는 가정에 의함
-#2-(b) True -> 오차평균은 0이라는 가정에 의함, 오차평균이 0이라는 가정하에 잔차들의 값의 평균은 0에 가까움 따라서 R제곱은 0~1사이의 값이 나옴
+#2-(b) True -> R = 1 - RSS/TSS
+
+  # TSS (Total sum of squares) = RSS (regression sum of squares) + SSE (sum of squared error terms)
+
+# From this point of view, as TSS >= SSE (equality refers to: the deviation in Y is not influenced by the regressors variables in any way) and TSS >= RSS (equality refers to the perfect model). I guess you should be able to understand it mathematically now. If not, feel free to contact me.
+# 
+# For the intuition. One should understand that is not possible to predict Y better using the regression (beta*X) than predicting Y by reading y1 and stating, "ah y1 is y1." Also, it is not possible to be able to predict less than nothing at all regarding Y with the regressors regarding Y (e.g. The regressors do not correlate with Y in any way.)
+# 
+# Therefore, 0 =< R <=1. Nevertheless, the boundaries (0 and 1) are in practice rarely obtained. In theory, however, an R of 0 or 1 is possible.
+
 #2-(c) True -> 선형모델의 가정하에 OLS추정기는 BLUE(Best linear unbiased estimator)이며, 분산이 가장작기 때문임
 #2-(d) True -> 동일분산 가정에 의함
 
@@ -39,7 +48,7 @@ summary(discrim)
 # (b)
 ols2 = lm(log(psoda)~prpblck+log(income), data = discrim)
 summary(ols2)
-# income이 1% 증가시 psoda 0.07% 증가. 탄력성성
+# income이 1% 증가시 psoda 0.07% 증가. 탄력성
 
 # (c)
 ols3 = lm(log(psoda)~prpblck+log(income)+prppov, data = discrim)
@@ -55,7 +64,7 @@ qt(0.995, 397)
 # (e)
 ols4 = lm(log(psoda)~prpblck+log(income)+prppov+log(hseval), data = discrim)
 summary(ols4)
-# log(income) and prppov individually insignificant(at even the 15% significance level).
+# log(income) and prppov individually insignificant at even the 15% significance level).
 
 # (f)
 # H0: beta2=beta3=0
@@ -76,6 +85,8 @@ pval
 
 anova(model2, model1)
 # They are jointly significant at the 5% level because the outcome of the Fstatistic is about 3.52 with p-value = 0.030. 각각이 insignificant하지만  jointly significant 하다는 것은 서로 상관성이 높기 때문(highly correlated)에 발생.
+
+lht(model1, c("prppov=0","log(income)=0"))
 
 
 # (g)

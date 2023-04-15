@@ -186,16 +186,15 @@ uhat1 = resid(model1)
 uhat2 = resid(model2)
 ssr1 = sum(uhat1^2)  #SSR of unrestricted model
 ssr2 = sum(uhat2^2)  #SSR of restricted model 
-Fstat = ((ssr2-ssr1)/3)/(ssr1/(n-4)) # 제약은 세개
+Fstat = ((ssr2-ssr1)/3)/(ssr1/(n-6)) # 제약은 세개, unres model의 x 개수 5개
 Fstat
-pval = 1 - pf(Fstat,3,n-4)
+pval = 1 - pf(Fstat,3,n-6)
 pval
 
+anova(model1, model2)
 
 
-
-
-lht(ols5, c("jc=univ","jc=exper"))
+lht(model1, c("exper=0","female=0", "black=0"))
 
 
 
@@ -224,5 +223,37 @@ qchisq(.95,2)   #critical value
 
 #F-test statistic
 #p-value
+
+
+
+
+
+#자동 계산도 가능
+#1)
+anova(model2,model1)
+
+#2)
+install.packages("car")
+library("car")
+
+?lht
+#lht: test linear hypothesis 
+lht(model1,"jc=univ")
+
+
+library(lmtest)
+#3) Wald test for nested models
+#install.packages("lmtest")
+#library("lmtest")
+#?waldtest
+#waldtest(model1, model2)
+
+#model1 = lm(lwage~jc+I(jc+univ)+exper,data=twoyear)
+#waldtest(model1, model2)
+
+# 또는
+#model1 = lm(lwage~jc+I(jc+univ)+exper,data=twoyear)
+#waldtest(model1, "jc")
+
 
 

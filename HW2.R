@@ -1,6 +1,5 @@
 library("readxl")
 library("dplyr")
-library()
 
 dataxls = as_tibble(read_excel("401ksubs.xls", col_names = c("e401k", "inc", "marr",  "male", "age",  "fsize",  "nettfa", "p401k","pira", "incsq", "agesq")))
 dataxls
@@ -21,4 +20,4 @@ confint(ols, 'inc', 0.95)
 ols2 = lm(I(nettfa - age) ~ inc + age, data=subdata)
 summary(ols2)
 
-qt(0.99,(1491))
+qt(0.995,(1491))
