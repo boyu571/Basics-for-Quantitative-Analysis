@@ -33,7 +33,6 @@ coeftest(ols1, vcov=vcovHC)
 #       (25.86)     (0.60)            (6.09)         (0.16)    (0.14)     (0.001)        (1.01)
 # Except log(cigpric), heteoskedasticity-robust standard errors are smaller than usual standard error.
 
-
 # d)
 #Feasible GLS for unknown form of heteroskedasticity
 uhat = resid(ols1)
