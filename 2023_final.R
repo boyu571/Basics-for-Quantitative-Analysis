@@ -5,28 +5,25 @@ library(sandwich)
 library(orcutt)
 library(AER)
 library(urca)
+library(dplyr)
 
 # 1
-gpa1 = read.csv("gpa1.csv")
-gpa1
-nrow(gpa1)
+crime1 = read.csv("CRIME1.csv")
+crime1
+nrow(crime1)
 
-complete.cases(gpa1)
+complete.cases(crime1)
 #na.omit returns the object with incomplete cases removed.
-data = na.omit(gpa1)
-n    = nrow(gpa1)
-colnames(gpa1)
+data = na.omit(crime1)
+n    = nrow(crime1)
+colnames(crime1)
 
-# a)
-ols1 = lm(colGPA ~ hsGPA + ACT + skipped + PC, data = gpa1)
+ols1 = lm(narr86 ~ pcnv + avgsen + tottime + ptime86 +qemp86, data = crime1)
 summary(ols1)
-# colGPA = 1.357 +0.413hsGPA +0.013ACT -0.071skipped +0.124PC
-#         (0.328)  (0.09)      (0.010)     (0.026)    (0.057)  
-# at 5% level, variable hsGPA, skipped, PC are statistically significant.
 
 # b)
-bptest(ols1,~ hsGPA + ACT + skipped + PC, data = gpa1)
-# p-value = 0.01831으로 5%에서 동분산이라는 귀무가설을 기각
+bptest(ols1,~ pcnv + avgsen + tottime + ptime86 +qemp86, data = crime1)
+# p-value = 3.546e-07으로 5%에서 동분산이라는 귀무가설을 기각
 
 # c)
 coeftest(ols1, vcov=vcovHC)
@@ -39,37 +36,43 @@ coeftest(ols1, vcov=vcovHC)
 #Feasible GLS for unknown form of heteroskedasticity
 uhat = resid(ols1)
 uhat
-ols1uhat = lm(I(log(uhat^2))~ hsGPA + ACT + skipped + PC, data = gpa1)
+ols1uhat = lm(I(log(uhat^2))~ pcnv + avgsen + tottime + ptime86 +qemp86, data = crime1)
 h = exp(fitted(ols1uhat))  #estimate of variance of the error term
 
 # WLS using weights=1/h
 
-fgls = lm(colGPA ~ hsGPA + ACT + skipped + PC,weights=1/h, data = gpa1)
+fgls = lm(narr86 ~ pcnv + avgsen + tottime + ptime86 +qemp86,weights = 1/h, data = crime1)
 coeftest(fgls)
 coeftest(ols1)
 summary(fgls)
 # colGPA = 1.454 +0.370hsGPA +0.016ACT -0.086skipped +0.125PC
 #         (0.287)  (0.077)    (0.009)     (0.021)    (0.06) 
 
+# e)
+crime1 <-crime1 %>% mutate(
+  narr86 = ifelse(narr86 == 0, 0, 1)
+)
+ols1 = lm(narr86 ~ pcnv + avgsen + tottime + ptime86 +qemp86, data = crime1)
+summary(ols1)
+
+# MLE
+
+
 
 
 # 2
-fertil3final = read.csv("fertil3final.csv")
-fertil3final
-nrow(gpa1)
+barium = read.csv("BARIUM.csv")
+barium
+nrow(barium)
 
-complete.cases(fertil3final)
+complete.cases(barium)
 #na.omit returns the object with incomplete cases removed.
-data = na.omit(fertil3final)
-n    = nrow(fertil3final)
-colnames(fertil3final)
+data = na.omit(barium)
+n    = nrow(barium)
+colnames(barium)
 
-# a)
-ols2 = lm(cgfr ~ cpe + cpe1 + cpe2, data = fertil3final)
+ols2 = lm(log(chnimp) ~ log(chempi) + log(gas) + log(rtwex) + befile6 +affile6 +afdec6, data = barium)
 summary(ols2)
-# cgfr = -0.946 -0.0356cpe -0.014cpe1 +0.110cpe2 
-#        (0.489)  (0.028)    (0.028)   (0.028)   
-# variable cpe2 is statistically significant.
 
 # b)
 bgtest(ols2, order=1)
@@ -88,30 +91,26 @@ summary(co)
 # variable cpe2 is statistically significant.
 
 
-
 # 3
-wagefinal = read.csv("wagefinal.csv")
-wagefinal
-nrow(wagefinal)
+ksubs = read.csv("401ksubs.csv")
+ksubs
+nrow(ksubs)
 
-complete.cases(wagefinal)
+complete.cases(ksubs)
 #na.omit returns the object with incomplete cases removed.
-data = na.omit(wagefinal)
-n    = nrow(wagefinal)
-colnames(wagefinal)
+data = na.omit(ksubs)
+n    = nrow(ksubs)
+colnames(ksubs)
 
-# a)
-ols3 = lm(log(wage) ~ educ + exper + tenure + black, data = wagefinal)
+ols3 = lm(pira ~ p401k + inc + I(inc^2) + age + I(age^2), data = ksubs)
 summary(ols3)
-# colGPA = 5.569 +0.0713educ +0.0180exper +0.0095tenure -0.17615black
-#        (0.1248)  (0.0072)    (0.0039)     (0.0030)       (0.0505) 
 
 # b)
-# We think that educ is endogenous. 
-# sibs are assumed to be exogenous.
-# Is 'Frsthalf' reasonable IV candidate for educ?
-ols_sibs = lm(educ ~ exper + tenure + black + sibs, data = wagefinal)
-coeftest(ols_sibs)
+# We think that p401k is endogenous. 
+# e401k are assumed to be exogenous.
+# Is 'e401k' reasonable IV candidate for educ?
+ols_e401k = lm(p401k ~ inc + I(inc^2) + age + I(age^2) + e401k, data = ksubs)
+coeftest(ols_e401k)
 # sibs is correlated to educ so sibs is reasonable IV
 
 # c)
@@ -126,17 +125,31 @@ coeftest(ols_sibs)
 # # OLS estimate of education is -0.09 and IV estimate of education is -0.17.
 # # Using frsthalf as an IV for educ, estimated effect has increased.
 
-tsls = ivreg(log(wage) ~ educ + exper + tenure + black|exper + tenure + black + sibs, data = wagefinal)
+tsls = ivreg(pira ~ p401k + inc + I(inc^2) + age + I(age^2)|inc + I(inc^2) + age + I(age^2) + e401k, data = ksubs)
 summary(tsls)
 summary(ols3)
 
 # d)
-tsls2 = ivreg(log(wage) ~ educ + exper + tenure + black|exper + tenure + black + sibs + meduc + feduc, data = wagefinal)
-summary(tsls2)
+#Test whether educ is exogenous or endogenous
+# ols2 = lm(educ~exper+I(exper^2)+motheduc+fatheduc,data=WAGEIV)
+# vhat = resid(ols2)
+
+ols4 = lm(p401k ~ inc + I(inc^2) + age + I(age^2) + e401k, data = ksubs)
+vhat = resid(ols4)
+
+# ols3 = lm(log(wage)~educ+exper+I(exper^2)+vhat,data=WAGEIV)
+# summary(ols3)
+
+ols5 = lm(pira ~ p401k + inc + I(inc^2) + age + I(age^2) +vhat, data = ksubs)
+summary(ols5)
+# 10% 유의수준에서 endogenous, 5% 유의수준에서 exogenous
 
 
 
-# 5-2
+
+
+
+# 5-1
 bondyields = read.csv("bondyields.csv")
 bondyields
 nrow(bondyields)
@@ -150,10 +163,10 @@ colnames(bondyields)
 # a)
 # 0. Check Estimates of AR Coefficients 
 
-ar1=arima(bondyields$AAA, order=c(1,0,0))
+ar1=arima(bondyields$tbill, order=c(1,0,0))
 ar1
 
-ar2=arima(monthly, order=c(1,0,0), xreg = 1:length(monthly))
+ar2=arima(bondyields$tbill, order=c(1,0,0), xreg = 1:length(bondyields$tbill))
 ar2
 # xreg가 linear trend 반영
 
@@ -164,7 +177,7 @@ ar2
 ?ur.df
 
 # Model with intercept
-monthly_adf1=ur.df(bondyields$AAA, type="drift")
+monthly_adf1=ur.df(bondyields$tbill, type="drift")
 # type = drift는 intercept만 들어간것
 summary(monthly_adf1)
 
@@ -187,11 +200,11 @@ monthly_adf1@pvalue
 
 
 # Model with intercept and trend
-monthly_adf2=ur.df(bondyields$AAA, type="trend")
+monthly_adf2=ur.df(bondyields$tbill, type="trend")
 # type = trend는 trend 포함
 monthly_adf2
 summary(monthly_adf2)
-
+monthly_adf2@teststat
 
 ### 2. Phillips-Perron (PP) Test
 ## Null = Unit Root
@@ -224,7 +237,7 @@ monthly_pp2@cval
 ?ur.kpss
 
 # Model with intercept
-monthly_kpss1=ur.kpss(bondyields$AAA, type="mu", lags = "long")
+monthly_kpss1=ur.kpss(bondyields$tbill, type="mu", lags = "long")
 monthly_kpss1
 # 1.12
 summary(monthly_kpss1)
@@ -232,9 +245,6 @@ summary(monthly_kpss1)
 # reject
 
 # Model with intercept and trend
-monthly_kpss2=ur.kpss(monthly, type="tau", lags = "long" )
+monthly_kpss2=ur.kpss(bondyields$tbill, type="tau", lags = "long" )
 monthly_kpss2
 summary(monthly_kpss2)
-
-
-

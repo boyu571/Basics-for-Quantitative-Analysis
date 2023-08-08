@@ -1,0 +1,12 @@
+BARIUM.DES
+
+  Obs:   131
+
+   chnimp                   Chinese imports, bar. chl.
+   befile6                  =1 for all 6 mos before filing
+   affile6                  =1 for all 6 mos after filing
+   afdec6                   =1 for all 6 mos after decision
+   chempi                   chemical production index
+   gas                      gasoline production
+   rtwex                    exchange rate index
+

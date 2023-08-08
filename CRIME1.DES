@@ -1,0 +1,12 @@
+CRIME1.DES
+
+  Obs:  2725
+
+  1. narr86                   # times arrested, 1986
+  2. pcnv                     proportion of prior convictions
+  3. avgsen                   avg sentence length, mos.
+  4. tottime                  time in prison since 18 (mos.)
+  5. ptime86                  mos. in prison during 1986
+  6. qemp86                   # quarters employed, 1986
+  
+
